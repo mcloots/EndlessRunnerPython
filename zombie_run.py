@@ -30,10 +30,39 @@ bat.y = 100
 bat.images = ['bat1', 'bat2', 'bat3', 'bat4']
 bat.fps = 10
 
+# Zombie
+zombie = Actor('walk1')
+zombie.x = 100
+zombie.y = 470
+zombie.images = []
+for i in range(1, 11):
+    zombie.images.append(f"walk{i}")
+zombie.fps = 40
+
+velocity = 0 # How fast our zombie moves in the up/down direction
+gravity = 1 # Gravity will change our velocity. The bigger, the more pull towards the ground
+
 def update():
+    global velocity # Makes a global variable of velocity
+
+    #### ZOMBIE ####
+    # zombie.next_image() is also possible, this way you don't heed the animate() and the fps property
+    zombie.animate()
+
+    # Jump in the air when the up arrow is pressed
+    if keyboard.up and zombie.y == 470:
+        velocity = -18
+    zombie.y = zombie.y + velocity
+    velocity += gravity
+
+    # Stop zombie falling of the screen
+    if zombie.y > 470:
+        velocity = 0
+        zombie.y = 470
+
     #### BAT ####
     bat.animate()
-    bat.x = bat.x - 3
+    bat.x -= 3
     if bat.x < -50:
         bat.x = random.randint(1000,15000)
         bat.y = random.randint(100, 250)
@@ -46,6 +75,7 @@ def draw():
     moon.draw()
     houses.draw()
     bat.draw()
+    zombie.draw()
 
 # Run the game
 pgzrun.go()
