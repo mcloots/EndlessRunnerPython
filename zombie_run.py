@@ -11,6 +11,8 @@ HEIGHT = 600
 # Colours
 black = (0, 0, 0)
 brown = (71, 34, 18)
+red = (212, 47, 47)
+white = (255, 255, 255)
 
 # Moon
 moon = Actor('moon')
@@ -47,8 +49,11 @@ ghost.x = random.randint(900, 5000)
 ghost.y = random.randint(250, 350)
 ghost.scale = 0.05
 
+# Game variables
+score = 0
 def update():
     global velocity # Makes a global variable of velocity
+    global score
 
     #### ZOMBIE ####
     # zombie.next_image() is also possible, this way you don't heed the animate() and the fps property
@@ -83,12 +88,15 @@ def update():
         sounds.collect.play()
         ghost.x = random.randint(900, 5000)
         ghost.y = random.randint(250, 350)
+        score += 5
 
 
 # Rect: 0,0 = x, y
 def draw():
     screen.draw.filled_rect(Rect(0, 0, WIDTH, HEIGHT - 100), (black))  # Sky
     screen.draw.filled_rect(Rect(0, 500, WIDTH, HEIGHT), (brown))  # Ground
+    screen.draw.text(f"Score: {score}", (20, 20), color = (red), fontname = 'creepster', fontsize = 30)
+    # screen.draw.text('Score: ' + str(score), color = (red), fontname = 'creepster', fontsize = 30)
 
     moon.draw()
     houses.draw()
