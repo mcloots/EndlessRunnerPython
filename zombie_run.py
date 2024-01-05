@@ -42,6 +42,11 @@ zombie.fps = 40
 velocity = 0 # How fast our zombie moves in the up/down direction
 gravity = 1 # Gravity will change our velocity. The bigger, the more pull towards the ground
 
+ghost = Actor('ghost')
+ghost.x = random.randint(900, 5000)
+ghost.y = random.randint(250, 350)
+ghost.scale = 0.05
+
 def update():
     global velocity # Makes a global variable of velocity
 
@@ -67,6 +72,19 @@ def update():
         bat.x = random.randint(1000,15000)
         bat.y = random.randint(100, 250)
 
+    #### GHOST ####
+    ghost.x -= 5
+    if ghost.x < -50:
+        ghost.x = random.randint(900, 5000)
+        ghost.y = random.randint(250, 350)
+
+    # Zombie & Ghost collision
+    if zombie.colliderect(ghost):
+        sounds.collect.play()
+        ghost.x = random.randint(900, 5000)
+        ghost.y = random.randint(250, 350)
+
+
 # Rect: 0,0 = x, y
 def draw():
     screen.draw.filled_rect(Rect(0, 0, WIDTH, HEIGHT - 100), (black))  # Sky
@@ -76,6 +94,7 @@ def draw():
     houses.draw()
     bat.draw()
     zombie.draw()
+    ghost.draw()
 
 # Run the game
 pgzrun.go()
