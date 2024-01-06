@@ -44,16 +44,24 @@ zombie.fps = 40
 velocity = 0 # How fast our zombie moves in the up/down direction
 gravity = 1 # Gravity will change our velocity. The bigger, the more pull towards the ground
 
+# Gost
 ghost = Actor('ghost')
 ghost.x = random.randint(900, 5000)
 ghost.y = random.randint(250, 350)
 ghost.scale = 0.05
+
+# Obstacles
+obstacles = [] # Empty list that will hold the spike obtacles
+obstacles_timeout = 0 # This number is a counter to ensure sikes appear in our game - but not all at once
+
+
 
 # Game variables
 score = 0
 def update():
     global velocity # Makes a global variable of velocity
     global score
+    global obstacles_timeout
 
     #### ZOMBIE ####
     # zombie.next_image() is also possible, this way you don't heed the animate() and the fps property
@@ -90,6 +98,22 @@ def update():
         ghost.y = random.randint(250, 350)
         score += 5
 
+    #### SPIKES ####
+    obstacles_timeout += 1 # On each frame refresh we add 1 to the counter
+    if obstacles_timeout > random.randint(60, 7000):
+        spikes = Actor('spikes')
+        spikes.x = 860
+        spikes.y = 500
+        spikes.scale = 0.25
+        obstacles.append(spikes) # Add spikes to list
+        obstacles_timeout = 0
+
+    # Move spikes across the screen
+    for spikes in obstacles:
+        spikes.x -= 8
+        if spikes.x < -50:
+            obstacles.remove(spikes)
+            score += 1
 
 # Rect: 0,0 = x, y
 def draw():
@@ -104,5 +128,7 @@ def draw():
     zombie.draw()
     ghost.draw()
 
+    for spikes in obstacles:
+        spikes.draw()
 # Run the game
 pgzrun.go()
