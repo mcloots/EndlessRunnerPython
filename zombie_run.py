@@ -8,6 +8,8 @@ TITLE = 'Zombie Runner'
 WIDTH = 800
 HEIGHT = 600
 
+music.play('music')
+
 # Colours
 black = (0, 0, 0)
 brown = (71, 34, 18)
@@ -67,6 +69,10 @@ def update():
     global obstacles_timeout
     global game_over
     global deathsound
+
+    if keyboard.down:
+        game_over = False
+        score = 0
 
     #### ZOMBIE ####
     # zombie.next_image() is also possible, this way you don't heed the animate() and the fps property
@@ -140,6 +146,7 @@ def draw():
     if game_over:
         screen.draw.text('Game Over', centerx=380, centery=150, color=(red), fontname = 'creepster', fontsize = 80)
         screen.draw.text(f"Score: {score}", centerx=380, centery=300, color=(white), fontname='creepster', fontsize=60)
+        music.stop()
     else:
         screen.draw.text(f"Score: {score}", (20, 20), color=(red), fontname='creepster', fontsize=30)
         moon.draw()
