@@ -58,10 +58,15 @@ obstacles_timeout = 0 # This number is a counter to ensure sikes appear in our g
 
 # Game variables
 score = 0
+game_over = False
+deathsound = False
+
 def update():
     global velocity # Makes a global variable of velocity
     global score
     global obstacles_timeout
+    global game_over
+    global deathsound
 
     #### ZOMBIE ####
     # zombie.next_image() is also possible, this way you don't heed the animate() and the fps property
@@ -86,10 +91,11 @@ def update():
         bat.y = random.randint(100, 250)
 
     #### GHOST ####
-    ghost.x -= 5
-    if ghost.x < -50:
-        ghost.x = random.randint(900, 5000)
-        ghost.y = random.randint(250, 350)
+    if not game_over:
+        ghost.x -= 5
+        if ghost.x < -50:
+            ghost.x = random.randint(900, 5000)
+            ghost.y = random.randint(250, 350)
 
     # Zombie & Ghost collision
     if zombie.colliderect(ghost):
@@ -99,36 +105,50 @@ def update():
         score += 5
 
     #### SPIKES ####
-    obstacles_timeout += 1 # On each frame refresh we add 1 to the counter
-    if obstacles_timeout > random.randint(60, 7000):
-        spikes = Actor('spikes')
-        spikes.x = 860
-        spikes.y = 500
-        spikes.scale = 0.25
-        obstacles.append(spikes) # Add spikes to list
-        obstacles_timeout = 0
+    if not game_over:
+        obstacles_timeout += 1 # On each frame refresh we add 1 to the counter
+        if obstacles_timeout > random.randint(60, 7000):
+            spikes = Actor('spikes')
+            spikes.x = 860
+            spikes.y = 500
+            spikes.scale = 0.25
+            obstacles.append(spikes) # Add spikes to list
+            obstacles_timeout = 0
 
-    # Move spikes across the screen
-    for spikes in obstacles:
-        spikes.x -= 8
-        if spikes.x < -50:
+        # Move spikes across the screen
+        for spikes in obstacles:
+            spikes.x -= 8
+            if spikes.x < -50:
+                obstacles.remove(spikes)
+                score += 1
+
+        # Collision between zombie and spikes
+        if zombie.collidelist(obstacles) != -1: # -1 is no collision
+            game_over = True
             obstacles.remove(spikes)
-            score += 1
+            if not deathsound:
+                sounds.gameover.play()
+            deathsound = True
+
 
 # Rect: 0,0 = x, y
 def draw():
     screen.draw.filled_rect(Rect(0, 0, WIDTH, HEIGHT - 100), (black))  # Sky
     screen.draw.filled_rect(Rect(0, 500, WIDTH, HEIGHT), (brown))  # Ground
-    screen.draw.text(f"Score: {score}", (20, 20), color = (red), fontname = 'creepster', fontsize = 30)
     # screen.draw.text('Score: ' + str(score), color = (red), fontname = 'creepster', fontsize = 30)
 
-    moon.draw()
-    houses.draw()
-    bat.draw()
-    zombie.draw()
-    ghost.draw()
+    if game_over:
+        screen.draw.text('Game Over', centerx=380, centery=150, color=(red), fontname = 'creepster', fontsize = 80)
+        screen.draw.text(f"Score: {score}", centerx=380, centery=300, color=(white), fontname='creepster', fontsize=60)
+    else:
+        screen.draw.text(f"Score: {score}", (20, 20), color=(red), fontname='creepster', fontsize=30)
+        moon.draw()
+        houses.draw()
+        bat.draw()
+        zombie.draw()
+        ghost.draw()
 
-    for spikes in obstacles:
-        spikes.draw()
+        for spikes in obstacles:
+            spikes.draw()
 # Run the game
 pgzrun.go()
